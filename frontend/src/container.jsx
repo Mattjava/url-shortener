@@ -4,9 +4,17 @@ import { useState } from 'react';
 
 function MainContainer() {
     const [url, setUrl] = useState('');
+    const [submitted, setSubmitted] = useState(false);
+    const [shortenedUrl, setShortenedUrl] = useState('');
 
-    function saveUrl() {
-        console.log(url);
+    function handleSubmit() {
+        if (url == '') {
+            console.log("Empty");
+            return;
+        }
+        setSubmitted(true);
+        setShortenedUrl(url);
+
     }
 
     return (
@@ -19,9 +27,12 @@ function MainContainer() {
                     placeholder = "Enter a URL."
                     className="w-full border border-gray-800 rounded-lg px-4 py-2"
                 ></input>
-                <button onClick={saveUrl}
+                <button onClick={handleSubmit}
                     className="w-full bg-gray-100 rounded-2xl mt-6 py-2 font-semibold text-black transition hover:bg-blue-500">
                     Submit</button>
+                {submitted && 
+                    <text className="font-bold to-blue-200 flex items-center justify-center my-3">Result: {shortenedUrl}</text>
+                }
             </div>
         </div>
     );
