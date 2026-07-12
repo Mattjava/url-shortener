@@ -1,13 +1,12 @@
-from django.shortcuts import render
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.http import HttpResponse
 from django.shortcuts import redirect
 
+from .models import *
+
 import json, random
 
 # Create your views here.
-
-temp_db = {}
 
 BASE_URL = "http://127.0.0.1:8000/url/"
 
@@ -36,18 +35,26 @@ def save_url(request):
 
     encoding = generate_code()
 
-    temp_db[encoding] = url
+    Link.objects.create(code=encoding, url=url)
 
     result = BASE_URL + encoding
 
     return HttpResponse(f'URL saved: {result}', status=200)
 
 def get_url(request, code):
-    if code not in temp_db:
+    try:
+        link_object = Link.objects.get(pk=code)
+    except Link.DoesNotExist as e:
         return HttpResponse('Code not found in DB', status=400)
-    return HttpResponse(temp_db[code], status=200)
+    except Exception as e:
+        return HttpResponse('Something went wrong in the server. Please try again.', status=500)
+    return HttpResponse(f"{getattr(link_object, 'url')}", status=200)
 
 def get_and_redirect_url(request, code):
-    if code not in temp_db:
+    try:
+        link_object = Link.objects.get(pk=code)
+    except Link.DoesNotExist as e:
         return HttpResponse('Code not found in DB', status=400)
-    return redirect(f"{temp_db[code]}")
+    except Exception as e:
+        return HttpResponse('Something went wrong in the server. Please try again.', status=500)
+    return redirect(f"{getattr(link_object, 'url')}")
