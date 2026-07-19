@@ -1,7 +1,5 @@
 import { useState } from 'react';
 
-
-
 function MainContainer() {
     const [url, setUrl] = useState('');
     const [submitted, setSubmitted] = useState(false);
