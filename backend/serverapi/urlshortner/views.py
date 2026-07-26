@@ -8,7 +8,7 @@ import json, random
 
 # Create your views here.
 
-BASE_URL = "http://127.0.0.1:8000/url/"
+BASE_URL = "http://127.0.0.1:8000/api/url/"
 
 # Helper method
 # Used to generate unique code
@@ -27,11 +27,14 @@ def health_check(request):
 @csrf_exempt
 def save_url(request):
     if request.method != 'POST':
-        return HttpResponse('Bad request', status=400)
+        return HttpResponse(json.dumps({'error': 'Bad request'}), status=400)
     
     body = json.loads(request.body)
 
     url = body['url']
+
+    if 'http' not in url[:5]:
+        return HttpResponse(json.dumps({'error': 'Invalid url'}), status=400)
 
     encoding = generate_code()
 
@@ -39,7 +42,11 @@ def save_url(request):
 
     result = BASE_URL + encoding
 
-    return HttpResponse(f'URL saved: {result}', status=200)
+    payload = {
+        'url': result
+    }
+
+    return HttpResponse(json.dumps(payload), status=200)
 
 def get_url(request, code):
     try:

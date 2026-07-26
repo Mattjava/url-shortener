@@ -5,13 +5,42 @@ function MainContainer() {
     const [submitted, setSubmitted] = useState(false);
     const [shortenedUrl, setShortenedUrl] = useState('');
 
-    function handleSubmit() {
+    async function handleSubmit() {
         if (url == '') {
             console.log("Empty");
             return;
         }
-        setSubmitted(true);
-        setShortenedUrl(url);
+
+        const body = JSON.stringify({
+            url: url
+        });
+
+        const headers = {
+            'Content-Type': 'application/json'
+        }
+
+        try {
+            const res = await fetch('api/url/save', {
+                headers: headers,
+                body: body,
+                method: 'POST'
+            });
+
+            const payload = await res.json();
+
+            if (payload.error) {
+                throw new Error(payload.error);
+            }
+
+            console.log(payload);
+
+            setSubmitted(true);
+            setShortenedUrl(payload.url);
+        } catch(error) {
+            console.log(error);
+            setShortenedUrl('' + error);
+            return;
+        }
 
     }
 
